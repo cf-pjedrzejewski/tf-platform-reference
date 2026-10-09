@@ -22,7 +22,7 @@ The agent works only inside the pull request that started it. It opens no other 
 | Compiled workflow (generated, do not edit) | `.github/workflows/terraform-test-agent.lock.yml` |
 | Custom agent: purpose, limits, skills it uses | `.github/agents/terraform-test-agent.agent.md` |
 | Skills | `.github/skills/change-impact-analysis/`, `terraform-test-authoring/`, `risk-findings/` |
-| Scripts | `scripts/ci/build_context.py`, `scripts/ci/run_module_tests.sh` |
+| Scripts | `scripts/ci/build_context.py`, `scripts/ci/run_module_tests.sh` (installed as `run-module-tests`) |
 
 The workflow names the agent with `engine.agent`, so gh-aw loads the definition. The definition tells the agent which skill file to read at each step. Paths and commands specific to this repository live in the skills and scripts, not in the workflow.
 
@@ -36,7 +36,7 @@ The workflow names the agent with `engine.agent`, so gh-aw loads the definition.
 
 **gh-aw instead of a hand-built workflow.** It gives the separation I would otherwise have to build: the agent job has a read-only token, and anything it wants to write goes through a validated, permission-scoped job. The agent runs in a sandbox that only reaches allowed domains, and model traffic goes through an API proxy that gh-aw sets up. Trade-off: the workflow is a compiled artifact (a `.md` source and a generated lock file), and the platform is a technical preview whose syntax can change.
 
-**The agent runs the tests itself.** Because the sandbox has no secrets and a limited network (`defaults`, `github`, `terraform`), the agent can run `terraform test` and fix its own tests in a real loop. The only command it may run for tests is `bash scripts/ci/run_module_tests.sh <module>`, plus read-only commands. It cannot run `apply`, `destroy` or `az`.
+**The agent runs the tests itself.** Because the sandbox has no secrets and a limited network (`defaults`, `github`, `terraform`), the agent can run `terraform test` and fix its own tests in a real loop. The only command it may run for tests is `run-module-tests <module>` (the workflow installs `scripts/ci/run_module_tests.sh` under that name), plus read-only commands. It cannot run `apply`, `destroy` or `az`.
 
 **Writes are narrow.** The agent can push only files matching `modules/*/tests/*.tftest.hcl`, enforced by `allowed-files` in the safe output job, not by the agent's own discipline. gh-aw also refuses changes to protected files such as `.github/` and agent instruction files.
 

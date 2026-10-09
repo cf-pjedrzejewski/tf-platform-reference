@@ -38,7 +38,7 @@ network:
 tools:
   edit:
   bash:
-    - "bash scripts/ci/run_module_tests.sh:*"
+    - "run-module-tests:*"
     - "cat"
     - "ls"
     - "grep"
@@ -63,6 +63,9 @@ steps:
       HEAD: ${{ github.event.pull_request.head.sha }}
     run: python3 scripts/ci/build_context.py "$BASE" "$HEAD" /tmp/gh-aw/context
 
+  - name: Put the test runner on the PATH
+    run: sudo install -m 0755 scripts/ci/run_module_tests.sh /usr/local/bin/run-module-tests
+
 safe-outputs:
   push-to-pull-request-branch:
     target: triggering
@@ -79,7 +82,7 @@ safe-outputs:
 Follow the custom agent definition. This pull request changes Terraform code. Your inputs are in `/tmp/gh-aw/context/`.
 
 1. Read `/tmp/gh-aw/context/context.json`. Use the `change-impact-analysis` skill to decide, for every affected module, whether tests are needed.
-2. For each module that needs tests, use the `terraform-test-authoring` skill to write or update its test file, run it with `bash scripts/ci/run_module_tests.sh <module>`, and fix failing tests. Stop after 3 attempts per module.
+2. For each module that needs tests, use the `terraform-test-authoring` skill to write or update its test file, run it with `run-module-tests <module>` exactly as written (no pipes, redirects or other commands around it), and fix failing tests. Stop after 3 attempts per module.
 3. Use the `risk-findings` skill for the risk scan hits and for anything else that looks unsafe in the changed modules.
 4. Commit only the test files on the checked-out pull request branch, then call the push safe output. If you wrote no test files, do not push.
 5. Post exactly one comment with the add-comment safe output, in this shape:

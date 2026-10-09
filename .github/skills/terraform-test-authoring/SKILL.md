@@ -32,7 +32,7 @@ The module's four files, its existing tests (if any), and the test file of a sib
 
 ## Verify
 
-Run `bash scripts/ci/run_module_tests.sh <module>...` for the modules you touched. It checks formatting and runs `terraform test`. A test file with no runs counts as failed.
+Run `run-module-tests <module>...` for the modules you touched, exactly as written, with no pipes or redirects. It checks formatting and runs `terraform test`. A test file with no runs counts as failed.
 
 If it fails:
 
