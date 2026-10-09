@@ -16,7 +16,7 @@ permissions:
 
 engine:
   id: copilot
-  model: sonnet-6x
+  model: haiku
   agent: terraform-test-agent
 
 timeout-minutes: 20

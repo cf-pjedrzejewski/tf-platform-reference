@@ -46,7 +46,7 @@ The workflow names the agent with `engine.agent`, so gh-aw loads the definition.
 
 **Two modes, one workflow.** Normally the agent writes tests only for behavior a pull request changes, and skips README-only or formatting changes with a reported reason. To cover existing untested modules, a maintainer adds the `backfill-tests` label to a pull request. The label is read into the context by `build_context.py`, and `change-impact-analysis` then treats every touched module without tests as `add`, even for a README-only change. Adding any other label does not start a run. This keeps backfill inside a pull request, so it uses the same checks, the same file allowlist and the same comment.
 
-**Model, turns and time.** The model is set in the workflow (`sonnet-6x`, a gh-aw alias for recent Claude Sonnet models served through Copilot), with at most 80 agent turns, 3 fix attempts per module (in the agent's instructions) and a 20 minute limit for the agent step. A tests-writing task is structured and bounded, so a mid-size model is enough. Pull requests that change nothing under `modules/` or `stacks/` do not start the workflow.
+**Model, turns and time.** The model is set in the workflow (`haiku`, a gh-aw alias for the Claude Haiku models served through Copilot), with at most 80 agent turns, 3 fix attempts per module (in the agent's instructions) and a 20 minute limit for the agent step. A tests-writing task is structured and bounded, and the agent gets clear skills and a runner that checks its work, so a small, cheap model is enough. A larger model such as `sonnet` would be the first change if the tests turn out too shallow. Pull requests that change nothing under `modules/` or `stacks/` do not start the workflow.
 
 ## Security measures
 
