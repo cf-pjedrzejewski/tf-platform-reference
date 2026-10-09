@@ -44,3 +44,25 @@ run "rejects_invalid_name" {
 
   expect_failures = [var.name]
 }
+
+run "versioning_can_be_enabled" {
+  command = plan
+
+  variables {
+    versioning_enabled = true
+  }
+
+  assert {
+    condition     = azurerm_storage_account.this.blob_properties[0].versioning_enabled == true
+    error_message = "Blob versioning must be on when versioning_enabled is true."
+  }
+}
+
+run "versioning_is_off_by_default" {
+  command = plan
+
+  assert {
+    condition     = azurerm_storage_account.this.blob_properties[0].versioning_enabled == false
+    error_message = "Blob versioning must stay off unless versioning_enabled is set."
+  }
+}

@@ -116,7 +116,7 @@ Follow the custom agent definition. This pull request changes Terraform code. Yo
 | --- | --- | --- |
 
 ### Test results
-<one line per module: passed or failed, with what is still failing>
+<one line per module: passed or failed, with what is still failing, then the cases the test covers (defaults, counts, names, outputs, and each validation rule checked with expect_failures)>
 
 ### Findings for a person to decide
 <bullets from the risk-findings skill, or "None.">

@@ -47,3 +47,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "versioning_enabled" {
+  description = "Keep previous versions of blobs."
+  type        = bool
+  default     = false
+}

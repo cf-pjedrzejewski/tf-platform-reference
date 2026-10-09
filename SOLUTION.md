@@ -101,4 +101,11 @@ The tests use `mock_provider "azurerm"`. They check what a module's plan contain
 
 See pull request #1: https://github.com/cf-pjedrzejewski/tf-platform-reference/pull/1
 
-In that run the agent analysed a pull request that added READMEs to five modules and a `versioning_enabled` option to `storage-account`. It skipped the five README-only modules with a reason each, added a test for the new option, ran `run-module-tests storage-account` (4 runs passed), pushed the test to the pull request branch, and posted one comment with the decisions, the test result and seven findings about risky module code. It did not change any module code.
+The tests the agent pushed are in the pull request's changed files (`modules/*/tests/main.tftest.hcl`).
+
+The agent ran in both modes on this pull request, which added READMEs to five modules and a `versioning_enabled` option to `storage-account`:
+
+1. **Changed code.** With `change-impact-analysis` it skipped the five README-only modules with a reason each and marked `storage-account` as `update`. With `terraform-test-authoring` it added a run for the new option, ran `run-module-tests storage-account` (4 runs passed) and pushed the test to the pull request branch. With `risk-findings` it posted seven findings about risky module code for a person to decide. It did not change any module code.
+2. **Backfill.** After the `backfill-tests` label was added, `change-impact-analysis` marked the five untested modules as `add`. For each module, one at a time, `terraform-test-authoring` wrote `tests/main.tftest.hcl` with `mock_provider "azurerm"`, ran `run-module-tests <module>`, fixed what failed (for example an assertion that compared a list to a set) and moved on. For `function-app` it used `override_data` so the module's `external` data source (`build-info.sh`) does not run during the test. Weak defaults it found were reported with `risk-findings` and left out of the assertions.
+
+Each comment lists the decisions, the result per module with the cases it covers, and the findings.

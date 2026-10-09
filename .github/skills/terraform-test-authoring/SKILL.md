@@ -44,4 +44,4 @@ Format as `terraform fmt` does: two spaces, aligned `=` in blocks.
 
 ## Output
 
-Test files only, committed on the pull request's branch. Do not change module code.
+Test files only, committed on the pull request's branch. Do not change module code. For each module, give the final comment the list of cases the test covers, including each validation rule checked with `expect_failures`.
