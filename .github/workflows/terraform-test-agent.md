@@ -16,7 +16,7 @@ permissions:
 
 engine:
   id: copilot
-  model: gpt-5
+  model: sonnet-6x
   agent: terraform-test-agent
 
 timeout-minutes: 20

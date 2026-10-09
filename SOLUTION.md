@@ -44,7 +44,7 @@ The workflow names the agent with `engine.agent`, so gh-aw loads the definition.
 
 **Plan-time code is overridden in tests.** For a module with an `external` data source, the test uses `override_data` so the script does not run during `terraform test`.
 
-**Model, turns and time.** The model is set in the workflow (`gpt-5`), with at most 40 agent turns, 3 fix attempts per module (in the agent's instructions) and a 20 minute limit for the agent step. A tests-writing task is structured and bounded, so a mid-size model is enough. Pull requests that change nothing under `modules/` or `stacks/` do not start the workflow.
+**Model, turns and time.** The model is set in the workflow (`sonnet-6x`, a gh-aw alias for recent Claude Sonnet models served through Copilot), with at most 40 agent turns, 3 fix attempts per module (in the agent's instructions) and a 20 minute limit for the agent step. A tests-writing task is structured and bounded, so a mid-size model is enough. Pull requests that change nothing under `modules/` or `stacks/` do not start the workflow.
 
 ## Security measures
 
