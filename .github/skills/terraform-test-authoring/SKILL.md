@@ -16,7 +16,7 @@ The module's four files, its existing tests (if any), and the test file of a sib
 ## Steps
 
 1. Read the module. List its resources, variables with validation, defaults, `for_each` expressions and outputs.
-2. Create or edit `modules/<name>/tests/main.tftest.hcl`. Keep the layout the existing tests use:
+2. Create or edit `modules/<name>/tests/main.tftest.hcl` with the file edit tool, one file at a time. Run every command from the repository root; do not `cd` into modules. Keep the layout the existing tests use:
    - `mock_provider "azurerm" {}` at the top.
    - One `variables {}` block with the smallest valid input.
    - `command = plan` for every run.

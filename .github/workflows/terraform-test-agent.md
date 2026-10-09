@@ -39,6 +39,8 @@ tools:
   edit:
   bash:
     - "run-module-tests:*"
+    - "mkdir:*"
+    - "cd"
     - "cat"
     - "ls"
     - "grep"
