@@ -65,6 +65,12 @@ steps:
       HEAD: ${{ github.event.pull_request.head.sha }}
     run: python3 scripts/ci/build_context.py "$BASE" "$HEAD" /tmp/gh-aw/context
 
+  - name: Prefetch providers so the agent needs no registry access
+    run: |
+      for dir in modules/*/; do
+        (cd "$dir" && terraform providers mirror /tmp/gh-aw/tf-mirror)
+      done
+
   - name: Put the test runner and Terraform on the PATH
     run: |
       sudo install -m 0755 scripts/ci/run_module_tests.sh /usr/local/bin/run-module-tests
