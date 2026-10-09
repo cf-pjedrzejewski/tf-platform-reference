@@ -6,6 +6,14 @@ set -uo pipefail
 
 status=0
 
+# The agent sandbox proxy drops registry traffic; use providers prefetched by the workflow when present.
+mirror="${TF_PROVIDER_MIRROR:-/tmp/gh-aw/tf-mirror}"
+if [ -d "$mirror" ]; then
+  cli_config=$(mktemp)
+  printf 'provider_installation {\n  filesystem_mirror {\n    path = "%s"\n  }\n}\n' "$mirror" > "$cli_config"
+  export TF_CLI_CONFIG_FILE="$cli_config"
+fi
+
 for name in "$@"; do
   dir="modules/$name"
   if [ ! -d "$dir" ]; then
