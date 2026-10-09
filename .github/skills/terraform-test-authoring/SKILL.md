@@ -32,7 +32,7 @@ The module's four files, its existing tests (if any), and the test file of a sib
 
 ## Verify
 
-Run `run-module-tests <module>...` for the modules you touched, exactly as written, with no pipes or redirects. It checks formatting and runs `terraform test`. A test file with no runs counts as failed.
+Run `run-module-tests <module>` for each module you touched, one module per call, exactly as written, with no pipes or redirects. Write one module's tests, run them, fix them, then move to the next module. It checks formatting and runs `terraform test`. A test file with no runs counts as failed.
 
 If it fails:
 

@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
-# Checks formatting and runs `terraform test` for the given modules.
-# Usage: run_module_tests.sh MODULE [MODULE...]
-# Prints a short result per module. Exits 1 if a check fails, or if a module has a test file with no runs.
+# Checks formatting and runs `terraform test` for one module.
+# Usage: run_module_tests.sh MODULE
+# Prints a short result. Exits 1 if a check fails, or if the module has a test file with no runs.
 set -uo pipefail
+
+# Several modules in one call overloaded the agent sandbox proxy, so the model calls that followed failed.
+if [ "$#" -ne 1 ]; then
+  echo "Run one module per call: run-module-tests <module>. Run it again for the next module."
+  exit 2
+fi
 
 status=0
 

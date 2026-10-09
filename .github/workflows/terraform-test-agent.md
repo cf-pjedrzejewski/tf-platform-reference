@@ -101,7 +101,7 @@ safe-outputs:
 Follow the custom agent definition. This pull request changes Terraform code. Your inputs are in `/tmp/gh-aw/context/`.
 
 1. Read `/tmp/gh-aw/context/context.json`. Use the `change-impact-analysis` skill to decide, for every affected module, whether tests are needed. The `backfill-tests` label in `labels` changes the decision as the skill describes.
-2. For each module that needs tests, use the `terraform-test-authoring` skill to write or update its test file, run it with `run-module-tests <module>` exactly as written (no pipes, redirects or other commands around it), and fix failing tests. Stop after 3 attempts per module.
+2. For each module that needs tests, use the `terraform-test-authoring` skill to write or update its test file, run it with `run-module-tests <module>` (one module per call, exactly as written, no pipes, redirects or other commands around it), and fix failing tests. Stop after 3 attempts per module.
 3. Use the `risk-findings` skill for the risk scan hits and for anything else that looks unsafe in the changed modules.
 4. Only if `run-module-tests` passed for every module you changed: commit only the test files on the checked-out pull request branch and call the push safe output. If it failed, or you could not run it, do not commit and do not push: put the proposed test code in the comment instead. If you wrote no test files, do not push.
 5. After the push attempt (so the comment reports its real outcome), post exactly one comment with the add-comment safe output, in this shape:
