@@ -22,6 +22,7 @@ At the start of a run, with `/tmp/gh-aw/context/context.json` available. It work
    - **No behavior**: comments, descriptions, formatting, README. No tests needed.
 3. Decide: `add` (the module has no tests), `update` (it has tests that the change affects), or `skip` (no behavior change, or the tests already cover it). Write a one-sentence reason for each.
 4. Never write tests for a module the pull request did not touch.
+5. **Backfill.** When `labels` in `context.json` contains `backfill-tests`, a maintainer wants coverage for existing code. Every affected module without tests is `add`, whatever kind of change it is (even README only). Say so in the reason. A module that already has tests follows the normal rules.
 
 ## Verify
 

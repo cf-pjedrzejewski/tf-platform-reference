@@ -5,6 +5,7 @@ Usage: build_context.py BASE_SHA HEAD_SHA OUT_DIR
 Writes OUT_DIR/context.json and OUT_DIR/diff.patch. Prints needs_agent=true|false.
 """
 import json
+import os
 import re
 import subprocess
 import sys
@@ -52,6 +53,17 @@ def consumers_of(name):
     return sorted(found)
 
 
+def event_labels():
+    path = os.environ.get("GITHUB_EVENT_PATH")
+    if not path:
+        return []
+    try:
+        event = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return sorted(label["name"] for label in event.get("pull_request", {}).get("labels", []))
+
+
 def main(base, head, out_dir):
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -76,6 +88,7 @@ def main(base, head, out_dir):
     context = {
         "base": base,
         "head": head,
+        "labels": event_labels(),
         "changed_files": changed,
         "modules": modules,
         "stack_changes": sorted({p for p in changed if p.startswith("stacks/")}),
