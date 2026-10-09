@@ -38,13 +38,15 @@ The workflow names the agent with `engine.agent`, so gh-aw loads the definition.
 
 **The agent runs the tests itself.** Because the sandbox has no secrets and a limited network (`defaults`, `github`, `terraform`), the agent can run `terraform test` and fix its own tests in a real loop. The only command it may run for tests is `run-module-tests <module>` (the workflow installs `scripts/ci/run_module_tests.sh` under that name), plus read-only commands. It cannot run `apply`, `destroy` or `az`.
 
-**Writes are narrow.** The agent can push only files matching `modules/*/tests/*.tftest.hcl`, enforced by `allowed-files` in the safe output job, not by the agent's own discipline. gh-aw also refuses changes to protected files such as `.github/` and agent instruction files.
+**Writes are narrow.** The agent can push only files matching `modules/*/tests/*.tftest.hcl`, enforced by `allowed-files` in the safe output job, not by the agent's own discipline. The platform checks the whole pull request branch, not only the agent's commit, so the pull request's own changes (module code, docs, scripts) would be refused. `excluded-files` removes those file types from that check, which also means the agent can never push module code. gh-aw also refuses changes to protected files such as `.github/` and agent instruction files.
 
 **Risky module code is reported, not fixed.** A fixed scan (`build_context.py`) flags plan-time execution, public network defaults, relaxed FTPS and broad roles. The agent adds its own judgement, gives each finding a reason and a recommended change, and never edits module code. A test that would fail because of a weak default is left out, and the finding says which assertion is missing.
 
 **Plan-time code is overridden in tests.** For a module with an `external` data source, the test uses `override_data` so the script does not run during `terraform test`.
 
-**Model, turns and time.** The model is set in the workflow (`sonnet-6x`, a gh-aw alias for recent Claude Sonnet models served through Copilot), with at most 40 agent turns, 3 fix attempts per module (in the agent's instructions) and a 20 minute limit for the agent step. A tests-writing task is structured and bounded, so a mid-size model is enough. Pull requests that change nothing under `modules/` or `stacks/` do not start the workflow.
+**Two modes, one workflow.** Normally the agent writes tests only for behavior a pull request changes, and skips README-only or formatting changes with a reported reason. To cover existing untested modules, a maintainer adds the `backfill-tests` label to a pull request. The label is read into the context by `build_context.py`, and `change-impact-analysis` then treats every touched module without tests as `add`, even for a README-only change. Adding any other label does not start a run. This keeps backfill inside a pull request, so it uses the same checks, the same file allowlist and the same comment.
+
+**Model, turns and time.** The model is set in the workflow (`sonnet-6x`, a gh-aw alias for recent Claude Sonnet models served through Copilot), with at most 80 agent turns, 3 fix attempts per module (in the agent's instructions) and a 20 minute limit for the agent step. A tests-writing task is structured and bounded, so a mid-size model is enough. Pull requests that change nothing under `modules/` or `stacks/` do not start the workflow.
 
 ## Security measures
 
@@ -77,6 +79,7 @@ The tests use `mock_provider "azurerm"`. They check what a module's plan contain
 - Stacks have no tests. A change in a stack is analysed and reported, but no tests are written for it.
 - The risk scan uses patterns. It finds the common cases, not every unsafe default.
 - A fork contributor gets no agent run.
+- A pull request that changes file types other than `.tf`, `.tfvars`, `.md`, `.sh`, `stacks/`, `scripts/` and `.github/` would still be refused by the push check. Add the types to `excluded-files` as needed.
 - The fix limit and the comment format are instructions to the model, not enforced by the platform. The turn cap and the file allowlist are enforced.
 - gh-aw is in technical preview. Some behavior, for example how the agent checks out the pull request branch before pushing, should be confirmed on a first run.
 
@@ -96,4 +99,6 @@ The tests use `mock_provider "azurerm"`. They check what a module's plan contain
 
 ## Example run
 
-See pull request <FILL IN AFTER THE RUN: link to the example pull request>.
+See pull request #1: https://github.com/cf-pjedrzejewski/tf-platform-reference/pull/1
+
+In that run the agent analysed a pull request that added READMEs to five modules and a `versioning_enabled` option to `storage-account`. It skipped the five README-only modules with a reason each, added a test for the new option, ran `run-module-tests storage-account` (4 runs passed), pushed the test to the pull request branch, and posted one comment with the decisions, the test result and seven findings about risky module code. It did not change any module code.

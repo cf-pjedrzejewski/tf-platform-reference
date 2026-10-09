@@ -3,12 +3,12 @@ description: Adds or updates Terraform module tests for the changed modules in a
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled]
     paths:
       - "modules/**"
       - "stacks/**"
 
-if: ${{ !github.event.pull_request.draft }}
+if: ${{ !github.event.pull_request.draft && (github.event.action != 'labeled' || github.event.label.name == 'backfill-tests') }}
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ engine:
   agent: terraform-test-agent
 
 timeout-minutes: 20
-max-turns: 40
+max-turns: 80
 
 concurrency:
   group: terraform-test-agent-${{ github.event.pull_request.number }}
@@ -92,7 +92,7 @@ safe-outputs:
 
 Follow the custom agent definition. This pull request changes Terraform code. Your inputs are in `/tmp/gh-aw/context/`.
 
-1. Read `/tmp/gh-aw/context/context.json`. Use the `change-impact-analysis` skill to decide, for every affected module, whether tests are needed.
+1. Read `/tmp/gh-aw/context/context.json`. Use the `change-impact-analysis` skill to decide, for every affected module, whether tests are needed. The `backfill-tests` label in `labels` changes the decision as the skill describes.
 2. For each module that needs tests, use the `terraform-test-authoring` skill to write or update its test file, run it with `run-module-tests <module>` exactly as written (no pipes, redirects or other commands around it), and fix failing tests. Stop after 3 attempts per module.
 3. Use the `risk-findings` skill for the risk scan hits and for anything else that looks unsafe in the changed modules.
 4. Only if `run-module-tests` passed for every module you changed: commit only the test files on the checked-out pull request branch and call the push safe output. If it failed, or you could not run it, do not commit and do not push: put the proposed test code in the comment instead. If you wrote no test files, do not push.
